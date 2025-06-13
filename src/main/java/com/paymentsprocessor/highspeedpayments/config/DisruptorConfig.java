@@ -73,11 +73,10 @@ public class DisruptorConfig {
         return ringBuffer;
     }
 
-    // We will create the publisher in the next step, for now we will comment this out
-    /*
+
     @Bean
     public PaymentEventPublisher paymentEventPublisher(RingBuffer<PaymentEvent> ringBuffer) {
         return new PaymentEventPublisher(ringBuffer);
     }
-    */
+
 }
