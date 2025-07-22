@@ -1,12 +1,9 @@
-Of course. A great project deserves a great README.md file. A descriptive README is your chance to showcase not just the final code, but your design process, architectural choices, and understanding of the underlying principles.
-
-Here is a long, descriptive README tailored specifically for the High-Speed Payment Processor project we built. You can create a file named README.md in the root directory of your project in IntelliJ and paste this content into it. GitHub will automatically render it beautifully.
-
 High-Speed Payment Processor
 A low-latency, high-throughput financial transaction processing engine built with Java, Spring Boot, and the LMAX Disruptor.
 This project is a backend system designed to simulate the core of a modern payment processor or financial exchange. It is engineered from the ground up to handle a massive volume of transactions with predictable, low latency by leveraging an asynchronous, event-driven architecture. The core of the system is the LMAX Disruptor, a high-performance inter-thread messaging library that enables lock-free concurrency.
 
 Table of Contents
+
 About The Project
 
 Core Concepts Demonstrated
@@ -155,3 +152,10 @@ Write Unit & Integration Tests: Add comprehensive tests using JUnit and Mockito 
 
 License
 Distributed under the MIT License. See LICENSE for more information.
+
+
+
+
+
+
+
