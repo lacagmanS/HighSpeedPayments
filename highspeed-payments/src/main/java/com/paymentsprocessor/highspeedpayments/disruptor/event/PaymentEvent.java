@@ -2,19 +2,14 @@ package com.paymentsprocessor.highspeedpayments.disruptor.event;
 
 import java.math.BigDecimal;
 
-
 public class PaymentEvent {
 
     private String transactionId;
     private BigDecimal amount;
     private String sourceAccountId;
     private String destinationAccountId;
-
-
     private String status;
-
-
-    // --- Getters and Setters ---
+    private long startTime;
 
     public String getTransactionId() { return transactionId; }
     public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
@@ -27,33 +22,29 @@ public class PaymentEvent {
 
     public String getDestinationAccountId() { return destinationAccountId; }
     public void setDestinationAccountId(String destinationAccountId) { this.destinationAccountId = destinationAccountId; }
-
-    // --- GETTER AND SETTER FOR NEW FIELD ---
+    
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
+    public long getStartTime() { return startTime; }
+    public void setStartTime(long startTime) { this.startTime = startTime; }
 
-    /**
-     * CRITICAL: Update the clear method to reset the new status field.
-     */
     public void clear() {
         this.transactionId = null;
         this.amount = null;
         this.sourceAccountId = null;
         this.destinationAccountId = null;
-        // --- ADD THIS LINE ---
         this.status = null;
+        this.startTime = 0L;
     }
 
     @Override
     public String toString() {
-        // Let's add the status to our toString for better debugging.
         return "PaymentEvent{" +
                 "transactionId='" + transactionId + '\'' +
                 ", amount=" + amount +
                 ", sourceAccountId='" + sourceAccountId + '\'' +
                 ", destinationAccountId='" + destinationAccountId + '\'' +
-                // --- ADD THIS LINE ---
                 ", status='" + status + '\'' +
                 '}';
     }

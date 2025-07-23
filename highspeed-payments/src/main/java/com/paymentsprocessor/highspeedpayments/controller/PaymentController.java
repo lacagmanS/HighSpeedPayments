@@ -1,8 +1,10 @@
 package com.paymentsprocessor.highspeedpayments.controller;
 
 import com.paymentsprocessor.highspeedpayments.domain.PaymentRequest;
+import com.paymentsprocessor.highspeedpayments.domain.TransactionRecord;
 import com.paymentsprocessor.highspeedpayments.service.AccountService;
 import com.paymentsprocessor.highspeedpayments.service.PaymentService;
+import com.paymentsprocessor.highspeedpayments.service.TransactionHistoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Map;
 
 @RestController
@@ -23,10 +26,12 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final AccountService accountService;
+    private final TransactionHistoryService historyService;
 
-    public PaymentController(PaymentService paymentService, AccountService accountService) {
+    public PaymentController(PaymentService paymentService, AccountService accountService, TransactionHistoryService historyService) {
         this.paymentService = paymentService;
         this.accountService = accountService;
+        this.historyService = historyService;
     }
 
     @PostMapping("/accounts")
@@ -40,6 +45,11 @@ public class PaymentController {
     @GetMapping("/accounts")
     public ResponseEntity<Map<String, BigDecimal>> getAllAccounts() {
         return ResponseEntity.ok(accountService.getAllAccounts());
+    }
+
+    @GetMapping("/payments/history")
+    public ResponseEntity<Collection<TransactionRecord>> getHistory() {
+        return ResponseEntity.ok(historyService.getTransactionHistory());
     }
 
     @PostMapping("/payments")
