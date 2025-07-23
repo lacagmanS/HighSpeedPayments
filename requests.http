@@ -1,0 +1,35 @@
+### 1. Create Source Account
+POST http://localhost:8080/api/accounts
+Content-Type: application/json
+
+{
+  "accountId": "Account-A",
+  "balance": "1000.00"
+}
+
+### 2. Create Destination Account
+POST http://localhost:8080/api/accounts
+Content-Type: application/json
+
+{
+  "accountId": "Account-B",
+  "balance": "500.00"
+}
+
+### 3. Verify Initial Balances
+GET http://localhost:8080/api/accounts
+
+
+### 4. Submit a Payment from A to B
+POST http://localhost:8080/api/payments
+Content-Type: application/json
+
+{
+  "sourceAccountId": "Account-A",
+  "destinationAccountId": "Account-B",
+  "amount": "150.00"
+}
+
+
+### 5. Verify Final Balances
+GET http://localhost:8080/api/accounts

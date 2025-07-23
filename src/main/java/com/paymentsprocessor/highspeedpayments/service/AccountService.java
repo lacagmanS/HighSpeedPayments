@@ -21,4 +21,9 @@ public class AccountService {
     public Map<String, BigDecimal> getAllAccounts() {
         return accountBalances;
     }
+
+    public void settlePayment(String sourceAccountId, String destinationAccountId, BigDecimal amount) {
+        accountBalances.computeIfPresent(sourceAccountId, (id, balance) -> balance.subtract(amount));
+        accountBalances.computeIfPresent(destinationAccountId, (id, balance) -> balance.add(amount));
+    }
 }
