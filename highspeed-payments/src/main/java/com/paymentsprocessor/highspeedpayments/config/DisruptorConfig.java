@@ -26,11 +26,11 @@ public class DisruptorConfig {
     private final ClearingHandler clearingHandler;
 
     public DisruptorConfig(JournalingHandler journalingHandler, ValidationHandler validationHandler, SettlementHandler settlementHandler, ClearingHandler clearingHandler) {
-        this.journalingHandler = journalingHandler;
-        this.validationHandler = validationHandler;
-        this.settlementHandler = settlementHandler;
-        this.clearingHandler = clearingHandler;
-    }
+    this.journalingHandler = journalingHandler;
+    this.validationHandler = validationHandler;
+    this.settlementHandler = settlementHandler;
+    this.clearingHandler = clearingHandler;
+}
 
     @Bean
     public RingBuffer<PaymentEvent> disruptorRingBuffer() {
