@@ -27,4 +27,12 @@ public class CryptoService {
         byte[] signature = rsa.sign();
         return Base64.getEncoder().encodeToString(signature);
     }
+
+    public boolean verify(String data, String signatureString) throws Exception {
+        Signature rsa = Signature.getInstance("SHA256withRSA");
+        rsa.initVerify(publicKey);
+        rsa.update(data.getBytes());
+        byte[] signatureBytes = Base64.getDecoder().decode(signatureString);
+        return rsa.verify(signatureBytes);
+    }
 }
