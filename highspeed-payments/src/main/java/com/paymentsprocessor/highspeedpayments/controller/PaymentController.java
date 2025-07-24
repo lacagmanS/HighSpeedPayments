@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,13 +56,18 @@ public class PaymentController {
         return ResponseEntity.ok(historyService.getTransactionHistory());
     }
 
-    @PostMapping("/payments/verify")
-    public ResponseEntity<Map<String, Boolean>> verifySignature(@RequestBody TransactionRecord record) {
+    @PostMapping("/payments/{txId}/verify")
+    public ResponseEntity<Map<String, Boolean>> verifySignature(@PathVariable String txId) {
+        TransactionRecord record = historyService.getTransactionRecord(txId);
+        if (record == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         boolean isValid = false;
         try {
             isValid = cryptoService.verify(record.toSignatureString(), record.getSignature());
         } catch (Exception e) {
-            // In a real app, you would log this error.
+            // Log error in a real app
         }
         return ResponseEntity.ok(Map.of("isValid", isValid));
     }
