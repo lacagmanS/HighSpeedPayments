@@ -3,6 +3,7 @@ package com.paymentsprocessor.highspeedpayments.controller;
 import com.paymentsprocessor.highspeedpayments.domain.PaymentRequest;
 import com.paymentsprocessor.highspeedpayments.domain.TransactionRecord;
 import com.paymentsprocessor.highspeedpayments.service.AccountService;
+import com.paymentsprocessor.highspeedpayments.service.CryptoService;
 import com.paymentsprocessor.highspeedpayments.service.PaymentService;
 import com.paymentsprocessor.highspeedpayments.service.TransactionHistoryService;
 import jakarta.validation.Valid;
@@ -27,11 +28,13 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final AccountService accountService;
     private final TransactionHistoryService historyService;
+    private final CryptoService cryptoService;
 
-    public PaymentController(PaymentService paymentService, AccountService accountService, TransactionHistoryService historyService) {
+    public PaymentController(PaymentService paymentService, AccountService accountService, TransactionHistoryService historyService, CryptoService cryptoService) {
         this.paymentService = paymentService;
         this.accountService = accountService;
         this.historyService = historyService;
+        this.cryptoService = cryptoService;
     }
 
     @PostMapping("/accounts")
@@ -50,6 +53,17 @@ public class PaymentController {
     @GetMapping("/payments/history")
     public ResponseEntity<Collection<TransactionRecord>> getHistory() {
         return ResponseEntity.ok(historyService.getTransactionHistory());
+    }
+
+    @PostMapping("/payments/verify")
+    public ResponseEntity<Map<String, Boolean>> verifySignature(@RequestBody TransactionRecord record) {
+        boolean isValid = false;
+        try {
+            isValid = cryptoService.verify(record.toSignatureString(), record.getSignature());
+        } catch (Exception e) {
+            // In a real app, you would log this error.
+        }
+        return ResponseEntity.ok(Map.of("isValid", isValid));
     }
 
     @PostMapping("/payments")
