@@ -18,4 +18,8 @@ public class TransactionHistoryService {
     public Collection<TransactionRecord> getTransactionHistory() {
         return history.values();
     }
+    
+    public TransactionRecord getTransactionRecord(String transactionId) {
+        return history.get(transactionId);
+    }
 }

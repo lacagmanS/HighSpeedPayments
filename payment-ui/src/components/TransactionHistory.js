@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Modal, Box, Button, Chip } from '@mui/material';
 
 const TransactionHistory = ({ refreshKey }) => {
     const [history, setHistory] = useState([]);
@@ -10,24 +11,19 @@ const TransactionHistory = ({ refreshKey }) => {
         const fetchHistory = async () => {
             try {
                 const response = await axios.get('http://localhost:8080/api/payments/history');
-                const sortedHistory = response.data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                setHistory(sortedHistory);
-            } catch (error) {
-                console.error("Failed to fetch history:", error);
-            }
+                setHistory(response.data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
+            } catch (error) { console.error("Failed to fetch history:", error); }
         };
         fetchHistory();
     }, [refreshKey]);
-
+    
     const handleVerify = async (tx) => {
         try {
-            const response = await axios.post('http://localhost:8080/api/payments/verify', tx);
+            const response = await axios.post(`http://localhost:8080/api/payments/${tx.transactionId}/verify`);
             setVerificationStatus(response.data.isValid ? '✅ Verified Authentic' : '❌ Verification FAILED');
-        } catch (error) {
-            setVerificationStatus('Error during verification');
-        }
+        } catch (error) { setVerificationStatus('Error during verification'); }
     };
-
+    
     const closeModal = () => {
         setSelectedTx(null);
         setVerificationStatus(null);
@@ -35,66 +31,57 @@ const TransactionHistory = ({ refreshKey }) => {
 
     return (
         <>
-            {selectedTx && (
-                <div style={modalOverlayStyle} onClick={closeModal}>
-                    <div style={modalContentStyle} onClick={e => e.stopPropagation()}>
-                        <h2>Transaction Invoice</h2>
-                        <p><strong>ID:</strong> {selectedTx.transactionId}</p>
-                        <p><strong>From:</strong> {selectedTx.sourceAccountId}</p>
-                        <p><strong>To:</strong> {selectedTx.destinationAccountId}</p>
-                        <p><strong>Amount:</strong> £{parseFloat(selectedTx.amount).toFixed(2)}</p>
-                        <p><strong>Status:</strong> {selectedTx.status}</p>
-                        <p><strong>Timestamp:</strong> {new Date(selectedTx.timestamp).toLocaleString()}</p>
-                        <p style={{fontFamily: 'monospace', wordBreak: 'break-all'}}><strong>Signature:</strong> {selectedTx.signature}</p>
-                        <button onClick={() => handleVerify(selectedTx)}>Verify Authenticity</button>
-                        {verificationStatus && <p><strong>Status: {verificationStatus}</strong></p>}
-                        <button onClick={closeModal} style={{marginTop: '20px'}}>Close</button>
-                    </div>
-                </div>
-            )}
-
-            <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
-                <h2>Transaction History (Click a row for details)</h2>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                        <tr>
-                            <th style={thStyle}>ID</th>
-                            <th style={thStyle}>From</th>
-                            <th style={thStyle}>To</th>
-                            <th style={thStyle}>Amount</th>
-                            <th style={thStyle}>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <Modal open={!!selectedTx} onClose={closeModal}>
+                <Box sx={modalStyle}>
+                    <Typography variant="h6" component="h2">🧾 Transaction Invoice</Typography>
+                    <Typography sx={{ mt: 2 }}><strong>ID:</strong> {selectedTx?.transactionId}</Typography>
+                    <Typography><strong>From:</strong> {selectedTx?.sourceAccountId}</Typography>
+                    <Typography><strong>To:</strong> {selectedTx?.destinationAccountId}</Typography>
+                    <Typography><strong>Amount:</strong> £{parseFloat(selectedTx?.amount).toFixed(2)}</Typography>
+                    <Typography><strong>Status:</strong> {selectedTx?.status}</Typography>
+                    <Typography><strong>Timestamp:</strong> {new Date(selectedTx?.timestamp).toLocaleString()}</Typography>
+                    <Typography sx={{fontFamily: 'monospace', wordBreak: 'break-all', fontSize: '12px', mt:1}}><strong>Signature:</strong> {selectedTx?.signature}</Typography>
+                    <Box sx={{ mt: 2 }}>
+                        <Button onClick={() => handleVerify(selectedTx)} variant="contained">Verify Authenticity</Button>
+                        {verificationStatus && <Typography sx={{ display: 'inline', marginLeft: 2, fontWeight: 'bold' }}>{verificationStatus}</Typography>}
+                    </Box>
+                </Box>
+            </Modal>
+            <TableContainer sx={{ maxHeight: 400 }}>
+                <Table stickyHeader size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell sx={{ fontWeight: '600' }}>ID</TableCell>
+                            <TableCell sx={{ fontWeight: '600' }}>From</TableCell>
+                            <TableCell sx={{ fontWeight: '600' }}>To</TableCell>
+                            <TableCell sx={{ fontWeight: '600' }} align="right">Amount</TableCell>
+                            <TableCell sx={{ fontWeight: '600' }} align="center">Status</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
                         {history.map((tx) => (
-                            <tr key={tx.transactionId} onClick={() => setSelectedTx(tx)} style={trStyle}>
-                                <td style={tdStyle}>{tx.transactionId.substring(0, 8)}...</td>
-                                <td style={tdStyle}>{tx.sourceAccountId}</td>
-                                <td style={tdStyle}>{tx.destinationAccountId}</td>
-                                <td style={tdStyle}>£{parseFloat(tx.amount).toFixed(2)}</td>
-                                <td style={{...tdStyle, color: tx.status === 'COMPLETED' ? 'green' : 'red' }}>{tx.status}</td>
-                            </tr>
+                            <TableRow key={tx.transactionId} onClick={() => setSelectedTx(tx)} hover sx={{ cursor: 'pointer' }}>
+                                <TableCell sx={{ fontFamily: 'monospace' }}>{tx.transactionId.substring(0, 8)}...</TableCell>
+                                <TableCell>{tx.sourceAccountId}</TableCell>
+                                <TableCell>{tx.destinationAccountId}</TableCell>
+                                <TableCell align="right">£{parseFloat(tx.amount).toFixed(2)}</TableCell>
+                                <TableCell align="center">
+                                    <Chip label={tx.status} color={tx.status === 'COMPLETED' ? 'success' : 'error'} size="small" variant="outlined"/>
+                                </TableCell>
+                            </TableRow>
                         ))}
-                    </tbody>
-                </table>
-            </div>
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </>
     );
 };
 
-const thStyle = { border: '1px solid #ddd', padding: '8px', textAlign: 'left', backgroundColor: '#f2f2f2' };
-const tdStyle = { border: '1px solid #ddd', padding: '8px', fontSize: '14px', wordBreak: 'break-all' };
-const trStyle = { cursor: 'pointer' };
-
-const modalOverlayStyle = {
-    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex',
-    alignItems: 'center', justifyContent: 'center'
-};
-
-const modalContentStyle = {
-    backgroundColor: '#fff', padding: '20px', borderRadius: '8px',
-    width: '500px', maxHeight: '90vh', overflowY: 'auto'
+const modalStyle = {
+    position: 'absolute', top: '50%', left: '50%',
+    transform: 'translate(-50%, -50%)', width: 600,
+    bgcolor: 'background.paper', border: '1px solid #555',
+    boxShadow: 24, p: 4, borderRadius: 2
 };
 
 export default TransactionHistory;
