@@ -20,27 +20,27 @@ The user interface is a data-rich command center for the payment processor, prov
 ### 1. Live Performance Graph
 The main chart, powered by **Recharts**, visualizes the system's live **Transactions Per Second (TPS)**, providing immediate feedback on the engine's throughput.
 
-![Live Performance Graph](Projects\payment-ui\public\livetransactions.jpg)
+![Live Performance Graph](https://github.com/lacagmanS/HighSpeedPayments/blob/625eb376fd4a8c8aefafafad21428a76b5a3e384/payment-ui/public/livetransactions.jpg)
 
 ### 2. Control Panel
 The control panel allows for full interaction with the system. Users can dynamically create new accounts and submit payments between them using interactive forms.
 
-![Control Panel for Account Creation and Payments](payment-ui\public\SendingPayments.jpg)
+![Control Panel for Account Creation and Payments](https://github.com/lacagmanS/HighSpeedPayments/blob/625eb376fd4a8c8aefafafad21428a76b5a3e384/payment-ui/public/SendingPayments.jpg)
 
 ### 3. Performance Stress Test
 The "Chaos Button" unleashes a high-volume burst of 500 transactions to demonstrate the system's stability and high-throughput capabilities under load.
 
-![Performance Test in Action](payment-ui\public\500paymenttest.jpg)
+![Performance Test in Action](https://github.com/lacagmanS/HighSpeedPayments/blob/625eb376fd4a8c8aefafafad21428a76b5a3e384/payment-ui/public/500paymenttest.jpg)
 
 ### 4. Live Feed & Transaction History
 A tabbed panel provides two views of transaction data. The **Live Feed** shows raw journal messages pushed via WebSockets the moment they are processed, while the **History** tab provides a structured log of all completed and failed transactions.
 
-![Live Feed and Transaction History Panel](payment-ui\public\transactionhistory.jpg)
+![Live Feed and Transaction History Panel](https://github.com/lacagmanS/HighSpeedPayments/blob/625eb376fd4a8c8aefafafad21428a76b5a3e384/payment-ui/public/transactionhistory.jpg)
 
 ### 5. Transaction Invoice & Verification
 Clicking any transaction in the history opens a detailed invoice. This includes the unique **RSA digital signature**. The "Verify Authenticity" button makes a call to the backend to cryptographically confirm that the transaction data has not been tampered with.
 
-![Transaction Invoice with Signature Verification](payment-ui\public\verifyauthentic.jpg)
+![Transaction Invoice with Signature Verification](https://github.com/lacagmanS/HighSpeedPayments/blob/625eb376fd4a8c8aefafafad21428a76b5a3e384/payment-ui/public/verifyauthentic.jpg)
 
 ---
 ## Tech Stack
