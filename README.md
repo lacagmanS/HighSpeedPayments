@@ -1,4 +1,4 @@
-# Project Vulcan: High-Frequency Payments Dashboard
+# Project: High-Frequency Payments Dashboard
 
 ### A full-stack, real-time simulation of a low-latency financial transaction engine built with Java, React, and the LMAX Disruptor.
 
@@ -20,7 +20,7 @@ The user interface is a data-rich command center for the payment processor, prov
 ### 1. Live Performance Graph
 The main chart, powered by **Recharts**, visualizes the system's live **Transactions Per Second (TPS)**, providing immediate feedback on the engine's throughput.
 
-![Live Performance Graph](payment-ui\public\livetransactions.jpg)
+![Live Performance Graph](Projects\payment-ui\public\livetransactions.jpg)
 
 ### 2. Control Panel
 The control panel allows for full interaction with the system. Users can dynamically create new accounts and submit payments between them using interactive forms.
