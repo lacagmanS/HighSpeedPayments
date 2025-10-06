@@ -2,6 +2,8 @@ package com.paymentsprocessor.highspeedpayments.disruptor.publisher;
 
 import com.lmax.disruptor.RingBuffer;
 import com.paymentsprocessor.highspeedpayments.disruptor.event.PaymentEvent;
+
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

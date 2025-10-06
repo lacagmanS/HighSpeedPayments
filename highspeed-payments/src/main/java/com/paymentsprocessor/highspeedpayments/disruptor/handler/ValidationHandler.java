@@ -2,44 +2,42 @@ package com.paymentsprocessor.highspeedpayments.disruptor.handler;
 
 import com.lmax.disruptor.EventHandler;
 import com.paymentsprocessor.highspeedpayments.disruptor.event.PaymentEvent;
-import com.paymentsprocessor.highspeedpayments.service.LoggingService;
+import com.paymentsprocessor.highspeedpayments.domain.AccountEntity;
+import com.paymentsprocessor.highspeedpayments.repository.AccountRepository;
+
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.UUID;
 
-/**
- * This is the second handler in our processing pipeline.
- *
- * Its responsibility is to apply business rules to the incoming payment.
- * This is where you would check for things like sufficient funds, valid accounts,
- * transaction limits, etc. For this project, we will perform a simple validation
- * to check if the payment amount is positive.
- */
 @Component
 public class ValidationHandler implements EventHandler<PaymentEvent> {
 
-    private final LoggingService loggingService;
+    private final AccountRepository accountRepository;
 
-    public ValidationHandler(LoggingService loggingService) {
-        // We can also use our logging service here to report validation outcomes.
-        this.loggingService = loggingService;
+    public ValidationHandler(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
     }
 
     @Override
     public void onEvent(PaymentEvent event, long sequence, boolean endOfBatch) throws Exception {
-        // In a real application, you would have a separate "Status" enum.
-        // For simplicity, we will use simple strings.
+        UUID sourceAccountId = UUID.fromString(event.getSourceAccountId());
+        Optional<AccountEntity> sourceAccountOpt = accountRepository.findById(sourceAccountId);
 
-        // Rule #1: The payment amount must be greater than zero.
-        if (event.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-            // If validation passes, we update the status on the event itself.
-            // The next handler in the chain can then act on this status.
-            event.setStatus("VALIDATED");
-        } else {
-            event.setStatus("FAILED_INVALID_AMOUNT");
+        if (sourceAccountOpt.isEmpty()) {
+            event.setStatus("FAILED_INVALID_SOURCE_ACCOUNT");
+            return;
         }
 
-        // It's good practice to log the outcome of business-critical steps.
-        // We'll add this logging logic after we update the PaymentEvent in Step 3.
+        AccountEntity sourceAccount = sourceAccountOpt.get();
+        boolean isAmountPositive = event.getAmount().compareTo(BigDecimal.ZERO) > 0;
+        boolean hasSufficientFunds = sourceAccount.getBalance().compareTo(event.getAmount()) >= 0;
+
+        if (isAmountPositive && hasSufficientFunds) {
+            event.setStatus("VALIDATED");
+        } else {
+            event.setStatus("FAILED_INSUFFICIENT_FUNDS");
+        }
     }
 }

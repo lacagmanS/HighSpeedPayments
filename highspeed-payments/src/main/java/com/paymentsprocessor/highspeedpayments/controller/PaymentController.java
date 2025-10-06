@@ -1,25 +1,21 @@
 package com.paymentsprocessor.highspeedpayments.controller;
 
+import com.paymentsprocessor.highspeedpayments.domain.AccountEntity;
 import com.paymentsprocessor.highspeedpayments.domain.PaymentRequest;
-import com.paymentsprocessor.highspeedpayments.domain.TransactionRecord;
+import com.paymentsprocessor.highspeedpayments.domain.TransactionEntity;
 import com.paymentsprocessor.highspeedpayments.service.AccountService;
-import com.paymentsprocessor.highspeedpayments.service.CryptoService;
 import com.paymentsprocessor.highspeedpayments.service.PaymentService;
 import com.paymentsprocessor.highspeedpayments.service.TransactionHistoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -29,47 +25,29 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final AccountService accountService;
     private final TransactionHistoryService historyService;
-    private final CryptoService cryptoService;
 
-    public PaymentController(PaymentService paymentService, AccountService accountService, TransactionHistoryService historyService, CryptoService cryptoService) {
+    public PaymentController(PaymentService paymentService, AccountService accountService, TransactionHistoryService historyService) {
         this.paymentService = paymentService;
         this.accountService = accountService;
         this.historyService = historyService;
-        this.cryptoService = cryptoService;
     }
 
     @PostMapping("/accounts")
     public ResponseEntity<Void> createAccount(@RequestBody Map<String, String> payload) {
-        String accountId = payload.get("accountId");
+        UUID userId = UUID.fromString(payload.get("userId"));
         BigDecimal balance = new BigDecimal(payload.get("balance"));
-        accountService.createAccount(accountId, balance);
+        accountService.createAccount(userId, balance);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/accounts")
-    public ResponseEntity<Map<String, BigDecimal>> getAllAccounts() {
+    public ResponseEntity<List<AccountEntity>> getAllAccounts() {
         return ResponseEntity.ok(accountService.getAllAccounts());
     }
 
     @GetMapping("/payments/history")
-    public ResponseEntity<Collection<TransactionRecord>> getHistory() {
+    public ResponseEntity<Collection<TransactionEntity>> getHistory() {
         return ResponseEntity.ok(historyService.getTransactionHistory());
-    }
-
-    @PostMapping("/payments/{txId}/verify")
-    public ResponseEntity<Map<String, Boolean>> verifySignature(@PathVariable String txId) {
-        TransactionRecord record = historyService.getTransactionRecord(txId);
-        if (record == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        boolean isValid = false;
-        try {
-            isValid = cryptoService.verify(record.toSignatureString(), record.getSignature());
-        } catch (Exception e) {
-            // Log error in a real app
-        }
-        return ResponseEntity.ok(Map.of("isValid", isValid));
     }
 
     @PostMapping("/payments")

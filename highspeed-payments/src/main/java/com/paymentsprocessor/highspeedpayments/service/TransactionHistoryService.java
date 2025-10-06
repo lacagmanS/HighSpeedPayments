@@ -1,25 +1,30 @@
 package com.paymentsprocessor.highspeedpayments.service;
 
-import com.paymentsprocessor.highspeedpayments.domain.TransactionRecord;
+import com.paymentsprocessor.highspeedpayments.domain.TransactionEntity;
+import com.paymentsprocessor.highspeedpayments.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class TransactionHistoryService {
 
-    private final Map<String, TransactionRecord> history = new ConcurrentHashMap<>();
+    private final TransactionRepository transactionRepository;
 
-    public void recordTransaction(TransactionRecord record) {
-        history.put(record.getTransactionId(), record);
+    public TransactionHistoryService(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
     }
 
-    public Collection<TransactionRecord> getTransactionHistory() {
-        return history.values();
+    public void recordTransaction(TransactionEntity transaction) {
+        transactionRepository.save(transaction);
+    }
+
+    public Collection<TransactionEntity> getTransactionHistory() {
+        return transactionRepository.findAll();
     }
     
-    public TransactionRecord getTransactionRecord(String transactionId) {
-        return history.get(transactionId);
+    public Optional<TransactionEntity> getTransactionRecord(UUID transactionId) {
+        return transactionRepository.findById(transactionId);
     }
 }
